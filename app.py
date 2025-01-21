@@ -6,7 +6,7 @@ import jwt
 from datetime import datetime, timedelta
 
 
-@app.route("/signup", ["POST"])
+@app.route("/signup", methods=["POST"])
 def signup():
     data = request.json
     email = data.get("email")
@@ -32,7 +32,7 @@ def signup():
     return make_response({"message": "Unable to create user"}, 500)
 
 
-@app.route("/login", ["POST"])
+@app.route("/login", methods=["POST"])
 def login():
     auth = request.json
     if not auth or not auth.get("email") or not auth.get("password"):
