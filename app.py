@@ -9,9 +9,9 @@ from datetime import datetime, timedelta
 @app.route("/signup", methods=["POST"])
 def signup():
     data = request.json
-    email = data.get("email")
     firstName = data.get("firstName")
     lastName = data.get("lastName")
+    email = data.get("email")
     password = data.get("password")
 
     if firstName and lastName and email and password:
@@ -20,6 +20,7 @@ def signup():
             return make_response({"message": "Please Sign in"}, 200)
         user = Users(
             email=email,
+            password=generate_password_hash(password),
             firstName=firstName,
             lastName=lastName,
         )
@@ -44,10 +45,10 @@ def login():
             401,
         )
     if check_password_hash(user.password, auth.get("password")):
-        token = jwt.decode(
+        token = jwt.encode(
             {
                 "id": user.id,
-                "exp": datetime.utcnow + timedelta(minutes=30),
+                "exp": datetime.utcnow() + timedelta(minutes=30),
             },
             "secret",
             "HS256",
