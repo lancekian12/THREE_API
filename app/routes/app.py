@@ -1,10 +1,12 @@
-from . import app, db
+from . import app
+from .. import db
 from flask import request, make_response
 from app.models import Users, Funds
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from datetime import datetime, timedelta
 from functools import wraps
+from sqlalchemy.sql import func
 
 
 @app.route("/signup", methods=["POST"])
@@ -78,3 +80,22 @@ def token_required(f):
         return f(current_user, *args, **kwargs)
 
     return decorated
+
+
+@app.routes("/funds", methods=["GET"])
+@token_required
+def getAllFunds(current_user):
+    funds = Funds.query.filter_by(userId=current_user.id).all()
+    totalSum = 0
+    if funds:
+        totalSum = (
+            Funds.query.with_entities(db.func.round(func.sum(Funds.amount), 2))
+            .filter_by(userId=current_user.id)
+            .all()
+        )[0][0]
+    return make_response(
+        {
+            "data": [fund.serialize for fund in funds],
+            "sum": totalSum,
+        }
+    )
