@@ -3,26 +3,24 @@ from sqlalchemy.sql import func
 
 
 class Users(db.Model):
-    __tablename__ = "users"  # Use lowercase for consistency
+    __tablename__ = "Users"
     id = db.Column(db.Integer, primary_key=True)
     firstName = db.Column(db.String(100), nullable=False)
     lastName = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(80), unique=True, nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    funds = db.relationship("Funds", backref="user", cascade="all, delete")
+    funds = db.relationship("Funds", backref="users")
 
     def __repr__(self):
-        return f"<User {self.firstName}>"
+        return f"<Student {self.firstName}>"
 
 
 class Funds(db.Model):
-    __tablename__ = "funds"  # Use lowercase for consistency
+    __tablename__ = "Funds"
     id = db.Column(db.Integer, primary_key=True)
     amount = db.Column(db.Numeric(10, 2), nullable=False)
-    userId = db.Column(
-        db.Integer, db.ForeignKey("users.id"), nullable=False
-    )  # Ensure 'users.id' matches the __tablename__ in Users
+    userId = db.Column(db.Integer, db.ForeignKey("Users.id"), nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
 
     @property
